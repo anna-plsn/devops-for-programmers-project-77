@@ -1,0 +1,10 @@
+#own
+app_path: app
+db_port: 6432
+
+# roles
+datadog_site: "{{ terraform_datadog_host }}"
+datadog_api_key: "{{ secret_datadog_api_key }}"
+
+pip_install_packages:
+  - name: docker 

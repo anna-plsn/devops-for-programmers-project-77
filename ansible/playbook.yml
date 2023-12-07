@@ -1,0 +1,49 @@
+- hosts: all
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Update and upgrade apt packages
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 86400
+
+  roles:
+    - role: docker-engine
+      tags: docker
+
+    - role: geerlingguy.pip
+      tags: book-api
+
+    - role: datadog.datadog
+      tags: datadog
+
+  tasks:
+    - name: Creates app directory
+      ansible.builtin.file:
+        path: "{{ app_path }}"
+        state: directory
+      tags: book-api
+
+    - name: Copy config
+      ansible.builtin.template:
+        src: appsettings.Production.json
+        dest: "{{ app_path }}/appsettings.Production.json"
+      register: book_api_config
+      tags: book-api
+
+    - name: Run book-api container
+      community.docker.docker_container:
+        name: book-api
+        image: anna_plsn/book-api:1.0
+        restart_policy: always
+        state: started
+        restart: "{{ book_api_config.changed }}"
+        ports:
+          - "{{ terraform_external_book_api_port }}:{{ terraform_internal_book_api_port }}"
+        env:
+          ASPNETCORE_ENVIRONMENT: Production
+          ASPNETCORE_URLS: "http://0.0.0.0:{{ terraform_internal_book_api_port }}"
+        volumes:
+          - ./app/appsettings.Production.json:/app/appsettings.Production.json
+      tags: book-api

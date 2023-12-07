@@ -1,0 +1,12 @@
+galaxy_info:
+  description: Role for installing Docker Engine
+  min_ansible_version: "2.1"
+
+  platforms:
+  - name: Ubuntu
+    versions:
+      - all
+
+  galaxy_tags: [ docker ]
+
+dependencies: []

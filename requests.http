@@ -1,0 +1,7 @@
+@host = "plaksina.space"
+
+POST https://{{host}}/seed HTTP/1.1
+
+###
+
+GET https://{{host}}/books HTTP/1.1
